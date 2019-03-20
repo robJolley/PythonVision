@@ -1,0 +1,10 @@
+print('Enter Table:')
+userInput = input()
+value = int(userInput)
+if(value > 0)
+	for x in range(0 12 1):
+		sum = x*value
+		print '%d by  %d = %d', %(value, x, sum)
+except ValueError:
+	print('Thats not a number silly')
+	
