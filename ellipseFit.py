@@ -16,6 +16,12 @@ and geometric distance (nonlinear least squares).'
 
 from math import *
 from numpy import *
+import numpy as np
+from pprint import pprint
+from matplotlib.patches import Ellipse
+import matplotlib.pyplot as plt
+import csv
+
 
 def ascol( arr ):
     '''
@@ -478,15 +484,62 @@ def test_main():
     '''
 
 def test2():
-    matlab_pts = '[ -0.114374090767  -0.044  ;  -0.125082007641  0.0265859306118  ;  -0.156045389318  0.0895227803882  ;  -0.203908872948  0.13799036509  ;  -0.2634857074  0.166736469863  ;  -0.328319818233  0.172646008213  ;  -0.391385423532  0.155078589964  ;  -0.445848386399  0.11593791747  ;  -0.485806799728  0.0594654899254  ;  -0.506930549417  -0.00821902888511  ;  -0.506930549417  -0.0797809711149  ;  -0.485806799728  -0.147465489925  ;  -0.445848386399  -0.20393791747  ;  -0.391385423532  -0.243078589964  ;  -0.328319818233  -0.260646008213  ;  -0.2634857074  -0.254736469863  ;  -0.203908872948  -0.22599036509  ;  -0.156045389318  -0.177522780388  ;  -0.125082007641  -0.114585930612 ]'
-    x = asarray( mat( matlab_pts.strip('[]') ) )
-    from pprint import pprint
-    pprint( fitellipse(x, 'linear', constraint = 'bookstein') )
-    pprint( fitellipse(x, 'linear', constraint = 'trace') )
-    pprint( fitellipse(x, 'nonlinear') )
+    xList = []
+    yList = []
+    plt.figure()
+    ax = plt.gca()
+    nextContour = True
+    oldContourNumber = 139.0
+    with open('contourList.csv') as ifile:
+        read = csv.reader(ifile)
+        for row in read:
+            if float(row[0]) != 0.0:
+#            break		
+                if nextContour == False:
+                    oldContourNumber = float(row[0])
+                    nextContour = True
+                if oldContourNumber == float(row[0]):
+                   xList.append(float(row[1]))
+#                   print(float(row[1]))
+#                   print(float(row[2]))
+                   yList.append(float(row[2]))
+                else:
+#                print('Xlist ',xList)
+#                print('YList ', yList)
+#                t = 1
+                   coOrds = list(zip(xList,yList))
+#            x = np.array(float(row[1]))
+#            y = np.array(float(row[2]))
+#                print('coOrds ',coOrds)
+#            print('YList ', y)
+#            a = fitEllipse(x,y)
+		
+#    matlab_pts = '[ -0.114374090767  -0.044  ;  -0.125082007641  0.0265859306118  ;  -0.156045389318  0.0895227803882  ;  -0.203908872948  0.13799036509  ;  -0.2634857074  0.166736469863  ;  -0.328319818233  0.172646008213  ;  -0.391385423532  0.155078589964  ;  -0.445848386399  0.11593791747  ;  -0.485806799728  0.0594654899254  ;  -0.506930549417  -0.00821902888511  ;  -0.506930549417  -0.0797809711149  ;  -0.485806799728  -0.147465489925  ;  -0.445848386399  -0.20393791747  ;  -0.391385423532  -0.243078589964  ;  -0.328319818233  -0.260646008213  ;  -0.2634857074  -0.254736469863  ;  -0.203908872948  -0.22599036509  ;  -0.156045389318  -0.177522780388  ;  -0.125082007641  -0.114585930612 ]'
+#    x = asarray( mat( matlab_pts.strip('[]') ) )
+#           from pprint import pprint
+                   pprint( fitellipse(coOrds, 'linear', constraint = 'bookstein') )
+                   Z,A,B,Alpha = fitellipse(coOrds, 'linear', constraint = 'bookstein')					   
+                   Alpha = np.rad2deg(Alpha)
+					   
+                   ellipse = Ellipse(xy=Z, width = A*2, height = B*2, angle = Alpha)
+					   
+                   ax.add_patch(ellipse)
+                   nextContour = False
+                   xList = []
+                   yList = []
+	
+    ax.set_xlim(0, 600)
+    ax.set_ylim(0, 600)			 
+    plt.show()
+#                   xList = []
+#               yList = []
+#    pprint( fitellipse(x, 'linear', constraint = 'trace') )
+#    pprint( fitellipse(x, 'nonlinear') )
 
 def main():
-    test_main()
+#    test_main()
     test2()
+plt.show()
+
 
 if __name__ == '__main__': main()
